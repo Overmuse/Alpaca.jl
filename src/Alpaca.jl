@@ -31,6 +31,8 @@ import TradingBase:
     cancel_orders
 import HTTP, JSON
 
+export get_credentials
+
 const PAPER_URL = "https://paper-api.alpaca.markets/v2"
 const LIVE_URL = "https://api.alpaca.markets/v2"
 const DATA_URL = "https://data.alpaca.markets/v1"
@@ -38,17 +40,28 @@ const DATA_URL = "https://data.alpaca.markets/v1"
 struct AlpacaBrokerage <: AbstractBrokerage
     id
     key
+    url
 end
 
 function Base.show(io::IO, b::AlpacaBrokerage)
-    print(io, "AlpacaBrokerage($(b.id), $(b.key[1:10])" * "*"^30 * ")")
+    print(io, "AlpacaBrokerage($(b.id), $(b.key[1:10])" * "*"^30 * ", $(b.url))")
 end
 
-function alpaca_url(;live::Bool = false)
+alpaca_url(api) = api.url
+
+function get_credentials(;live = false)
     if live
-        LIVE_URL
+        return AlpacaBrokerage(
+            ENV["APCA-LIVE-KEY-ID"],
+            ENV["APCA-LIVE-SECRET-KEY"],
+            LIVE_URL
+        )
     else
-        PAPER_URL
+        return AlpacaBrokerage(
+            ENV["APCA-PAPER-KEY-ID"],
+            ENV["APCA-PAPER-SECRET-KEY"],
+            PAPER_URL
+            )
     end
 end
 
@@ -59,50 +72,31 @@ function alpaca_headers(x::AlpacaBrokerage)
     )
 end
 
-# function alpaca_headers(;live::Bool = false)
-#     if live
-#         b = AlpacaBrokerage(
-#             ENV["APCA-LIVE-API-KEY-ID"],
-#             ENV["APCA-LIVE-API-SECRET-KEY"]
-#         )
-#     else
-#         b = AlpacaBrokerage(
-#             ENV["APCA-API-KEY-ID"],
-#             ENV["APCA-API-SECRET-KEY"]
-#         )
-#     end
-#     alpaca_headers(b)
-# end
-
-function alpaca_get(api::AlpacaBrokerage, endpoint::String, params = Dict(), body = ""; live::Bool = false)
-    url = alpaca_url(live = live)
+function alpaca_get(api::AlpacaBrokerage, endpoint::String, params = Dict(), body = "")
     headers = alpaca_headers(api)
     sleep(0.3) # 200 requests / minute limit
-    result = HTTP.get(url * endpoint, headers, JSON.json(body), query = params)
+    result = HTTP.get(alpaca_url(api) * endpoint, headers, JSON.json(body), query = params)
     !HTTP.iserror(result) && JSON.parse(String(result.body))
 end
 
-function alpaca_post(api::AlpacaBrokerage, endpoint::String, body; live::Bool = false)
-    url = alpaca_url(live = live)
+function alpaca_post(api::AlpacaBrokerage, endpoint::String, body)
     headers = alpaca_headers(api)
     sleep(0.3) # 200 requests / minute limit
-    result = HTTP.post(url * endpoint, headers, JSON.json(body))
+    result = HTTP.post(alpaca_url(url) * endpoint, headers, JSON.json(body))
     !HTTP.iserror(result) && JSON.parse(String(result.body))
 end
 
-function alpaca_delete(api::AlpacaBrokerage, endpoint::String; live::Bool = false)
-    url = alpaca_url(live = live)
+function alpaca_delete(api::AlpacaBrokerage, endpoint::String)
     headers = alpaca_headers(api)
     sleep(0.3) # 200 requests / minute limit
-    result = HTTP.delete(url * endpoint, headers)
+    result = HTTP.delete(alpaca_url(url) * endpoint, headers)
     !HTTP.iserror(result) && return
 end
 
 function alpaca_market_get(api::AlpacaBrokerage, endpoint::String, params = Dict(), body = "")
-    url = DATA_URL
     headers = alpaca_headers(api)
     sleep(0.3) # 200 requests / minute limit
-    result = HTTP.get(url * endpoint, headers, JSON.json(body), query = params)
+    result = HTTP.get(DATA_URL * endpoint, headers, JSON.json(body), query = params)
     !HTTP.iserror(result) && JSON.parse(String(result.body))
 end
 

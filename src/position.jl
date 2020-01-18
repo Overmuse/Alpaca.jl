@@ -53,18 +53,18 @@ function Base.show(io::IO, ::MIME"text/plain", p::AlpacaPosition)
     print(io, lpad(something(getproperty(p, propertynames(p)[end]), "null"), 45 - length(string(propertynames(p)[end]))))
 end
 
-function get_positions(api::AlpacaBrokerage; live::Bool = false)
-    positions = AlpacaPosition.(alpaca_get(api, "/positions", live = live))
+function get_positions(api::AlpacaBrokerage)
+    positions = AlpacaPosition.(alpaca_get(api, "/positions"))
 end
 
-function get_position(api::AlpacaBrokerage, ticker; live::Bool = false)
-    positions = AlpacaPosition(alpaca_get(api, "/positions/$ticker", live = live))
+function get_position(api::AlpacaBrokerage, ticker)
+    positions = AlpacaPosition(alpaca_get(api, "/positions/$ticker"))
 end
 
-function close_positions(api::AlpacaBrokerage; live::Bool = false)
-    positions = alpaca_delete(api, "/positions", live = live)
+function close_positions(api::AlpacaBrokerage)
+    positions = alpaca_delete(api, "/positions")
 end
 
-function close_position(api::AlpacaBrokerage, ticker; live::Bool = false)
-    positions = alpaca_delete(api, "/positions/$ticker", live = live)
+function close_position(api::AlpacaBrokerage, ticker)
+    positions = alpaca_delete(api, "/positions/$ticker")
 end

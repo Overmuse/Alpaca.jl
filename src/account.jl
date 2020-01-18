@@ -74,10 +74,10 @@ end
 
 # Functions --------------------------------------------------------------------------------
 
-function get_account(api::AlpacaBrokerage; live::Bool = false)
-    alpaca_get(api, "/account", live = live) |> AlpacaAccount
+function get_account(api::AlpacaBrokerage)
+    alpaca_get(api, "/account") |> AlpacaAccount
 end
 
-function get_account_configurations(api::AlpacaBrokerage; live::Bool = false)
-    alpaca_get(api, "/account/configurations", live = live)
+function get_account_configurations(api::AlpacaBrokerage)
+    alpaca_get(api, "/account/configurations")
 end

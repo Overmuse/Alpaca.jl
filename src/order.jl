@@ -93,21 +93,21 @@ end
 
 # Functions --------------------------------------------------------------------------------
 
-function get_order(api::AlpacaBrokerage, id::UUID; live = false)
-    AlpacaOrder(alpaca_get(api, "/orders/" * string(id), Dict(), live = live))
+function get_order(api::AlpacaBrokerage, id::UUID)
+    AlpacaOrder(alpaca_get(api, "/orders/" * string(id), Dict()))
 end
 
-function get_order(api::AlpacaBrokerage, client_order_id::String; live = false)
-    AlpacaOrder(alpaca_get(api, "/orders:by_client_order_id", Dict(:client_order_id => client_order_id), live = live))
+function get_order(api::AlpacaBrokerage, client_order_id::String)
+    AlpacaOrder(alpaca_get(api, "/orders:by_client_order_id", Dict(:client_order_id => client_order_id)))
 end
 
-function get_orders(api::AlpacaBrokerage; status = "open", limit = 50, after = "", until = "", direction = "desc", live = false)
+function get_orders(api::AlpacaBrokerage; status = "open", limit = 50, after = "", until = "", direction = "desc")
     params = Dict(:status => status,
                   :limit => limit,
                   :after => after,
                   :until => until,
                   :direction => direction)
-    AlpacaOrder.(alpaca_get(api, "/orders", params, live = live))
+    AlpacaOrder.(alpaca_get(api, "/orders", params))
 end
 
 JSON.lower(::DAY) = "day"
@@ -118,7 +118,7 @@ JSON.lower(::IOC) = "ioc"
 JSON.lower(::FOK) = "fok"
 JSON.lower(::MarketOrder) = "market"
 
-function submit_order(api::AlpacaBrokerage, ticker, quantity::Integer, type; time_in_force::AbstractOrderDuration = DAY(), extended_hours = false, client_order_id = nothing, live = false)
+function submit_order(api::AlpacaBrokerage, ticker, quantity::Integer, type; time_in_force::AbstractOrderDuration = DAY(), extended_hours = false, client_order_id = nothing)
     side = quantity >= 0 ? "buy" : "sell"
     body = Dict(:symbol => ticker,
                 :qty => abs(quantity),
@@ -129,13 +129,13 @@ function submit_order(api::AlpacaBrokerage, ticker, quantity::Integer, type; tim
                 :stop_price => stop_price(type),
                 :extended_hours => extended_hours,
                 :client_order_id => client_order_id)
-    alpaca_post(api, "/orders", body, live = live) |> AlpacaOrder
+    alpaca_post(api, "/orders", body) |> AlpacaOrder
 end
 
-function cancel_order(api::AlpacaBrokerage, id::UUID; live = false)
-    alpaca_delete(api, "/orders/" * string(id), live = live)
+function cancel_order(api::AlpacaBrokerage, id::UUID)
+    alpaca_delete(api, "/orders/" * string(id))
 end
 
-function cancel_orders(api::AlpacaBrokerage; live = false)
-    alpaca_delete(api, "/orders", live = live)
+function cancel_orders(api::AlpacaBrokerage)
+    alpaca_delete(api, "/orders")
 end
