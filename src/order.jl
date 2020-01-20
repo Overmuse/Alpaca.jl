@@ -19,7 +19,7 @@ struct AlpacaOrder <: AbstractOrder
     filled_qty
     type
     side
-    time_in_force
+    duration
     limit_price
     stop_price
     filled_avg_price
@@ -118,13 +118,13 @@ JSON.lower(::IOC) = "ioc"
 JSON.lower(::FOK) = "fok"
 JSON.lower(::MarketOrder) = "market"
 
-function submit_order(api::AlpacaBrokerage, ticker, quantity::Integer, type; time_in_force::AbstractOrderDuration = DAY(), extended_hours = false, client_order_id = nothing)
+function submit_order(api::AlpacaBrokerage, ticker, quantity::Integer, type; duration::AbstractOrderDuration = DAY(), extended_hours = false, client_order_id = nothing)
     side = quantity >= 0 ? "buy" : "sell"
     body = Dict(:symbol => ticker,
                 :qty => abs(quantity),
                 :side => side,
                 :type => type,
-                :time_in_force => time_in_force,
+                :time_in_force => duration,
                 :limit_price => limit_price(type),
                 :stop_price => stop_price(type),
                 :extended_hours => extended_hours,
