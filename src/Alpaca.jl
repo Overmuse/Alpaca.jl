@@ -25,10 +25,13 @@ import TradingBase:
     get_account,
     get_order,
     get_orders,
+    get_position,
     get_positions,
     submit_order,
     cancel_order,
-    cancel_orders
+    cancel_orders,
+    close_position,
+    close_positions,
 import HTTP, JSON
 
 export get_credentials
