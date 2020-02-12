@@ -1,4 +1,4 @@
-export AlpacaAccount, get_account, get_account_configurations
+export AlpacaAccount, get_account, get_account_configurations, get_equity
 # Structs ----------------------------------------------------------------------------------
 struct AlpacaAccount{T <: AbstractFloat} <: AbstractAccount
     id                      :: UUID
@@ -80,4 +80,8 @@ end
 
 function get_account_configurations(api::AlpacaBrokerage)
     alpaca_get(api, "/account/configurations")
+end
+
+function get_equity(api::AlpacaBrokerage)
+    get_account(api).equity
 end

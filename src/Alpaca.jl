@@ -23,6 +23,7 @@ using TradingBase:
 
 import TradingBase:
     get_account,
+    get_equity,
     get_order,
     get_orders,
     get_position,
@@ -31,7 +32,7 @@ import TradingBase:
     cancel_order,
     cancel_orders,
     close_position,
-    close_positions,
+    close_positions
 import HTTP, JSON
 
 export get_credentials
