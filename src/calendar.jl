@@ -2,16 +2,16 @@ export AlpacaCalendar, get_calendar
 
 # Structs ----------------------------------------------------------------------------------
 struct AlpacaCalendar
-    date
-    open
-    close
+    date::Date
+    open::Time
+    close::Time
 end
 
 function AlpacaCalendar(d::Dict)
     AlpacaCalendar(
-        d["date"],
-        d["open"],
-        d["close"]
+        parse(Date, d["date"]),
+        parse(Time, d["open"]),
+        parse(Time, d["close"])
     )
 end
 

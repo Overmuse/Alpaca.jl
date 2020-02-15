@@ -3,28 +3,28 @@ export AlpacaOrder, get_order, get_orders, submit_order, cancel_order, cancel_or
 # Structs ----------------------------------------------------------------------------------
 
 struct AlpacaOrder <: AbstractOrder
-    id
-    client_order_id
-    created_at
-    updated_at
-    submitted_at
-    filled_at
-    expired_at
-    canceled_at
-    failed_at
-    asset_id
-    symbol
-    asset_class
-    quantity
-    filled_quantity
-    type
-    side
-    duration
-    limit_price
-    stop_price
-    filled_avg_price
-    status
-    extended_hours
+    id::UUID
+    client_order_id::String
+    created_at::Union{DateTime, Nothing}
+    updated_at::Union{DateTime, Nothing}
+    submitted_at::Union{DateTime, Nothing}
+    filled_at::Union{DateTime, Nothing}
+    expired_at::Union{DateTime, Nothing}
+    canceled_at::Union{DateTime, Nothing}
+    failed_at::Union{DateTime, Nothing}
+    asset_id::UUID
+    symbol::String
+    asset_class::String
+    quantity::Int
+    filled_quantity::Int
+    type::String
+    side::String
+    duration::String
+    limit_price::Union{Float64, Nothing}
+    stop_price::Union{Float64, Nothing}
+    filled_avg_price::Union{Float64, Nothing}
+    status::String
+    extended_hours::Bool
 end
 
 function AlpacaOrder(d::Dict)
@@ -46,9 +46,9 @@ function AlpacaOrder(d::Dict)
         d["type"],
         d["side"],
         d["time_in_force"],
-        d["limit_price"],
-        d["stop_price"],
-        d["filled_avg_price"],
+        isnothing(d["limit_price"]) ? nothing : parse(Float64, d["limit_price"]),
+        isnothing(d["stop_price"]) ? nothing : parse(Float64, d["stop_price"]),
+        isnothing(d["filled_avg_price"]) ? nothing : parse(Float64, d["filled_avg_price"]),
         d["status"],
         d["extended_hours"]
     )

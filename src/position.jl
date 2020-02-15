@@ -1,22 +1,22 @@
 export AlpacaPosition, get_positions, get_position, close_positions, close_position
 
 struct AlpacaPosition <: AbstractPosition
-    asset_id
-    symbol
-    exchange
-    asset_class
-    avg_entry_price
-    quantity
-    side
-    market_value
-    cost_basis
-    unrealized_pl
-    unrealized_plpc
-    unrealized_intraday_pl
-    unrealized_intraday_plpc
-    current_price
-    lastday_price
-    change_today
+    asset_id::UUID
+    symbol::String
+    exchange::String
+    asset_class::String
+    avg_entry_price::Float64
+    quantity::Int
+    side::String
+    market_value::Float64
+    cost_basis::Float64
+    unrealized_pl::Float64
+    unrealized_plpc::Float64
+    unrealized_intraday_pl::Float64
+    unrealized_intraday_plpc::Float64
+    current_price::Float64
+    lastday_price::Float64
+    change_today::Float64
 end
 
 function AlpacaPosition(d::Dict)
@@ -25,18 +25,18 @@ function AlpacaPosition(d::Dict)
         d["symbol"],
         d["exchange"],
         d["asset_class"],
-        d["avg_entry_price"],
-        d["qty"],
+        parse(Float64, d["avg_entry_price"]),
+        parse(Int, d["qty"]),
         d["side"],
-        d["market_value"],
-        d["cost_basis"],
-        d["unrealized_pl"],
-        d["unrealized_plpc"],
-        d["unrealized_intraday_pl"],
-        d["unrealized_intraday_plpc"],
-        d["current_price"],
-        d["lastday_price"],
-        d["change_today"]
+        parse(Float64, d["market_value"]),
+        parse(Float64, d["cost_basis"]),
+        parse(Float64, d["unrealized_pl"]),
+        parse(Float64, d["unrealized_plpc"]),
+        parse(Float64, d["unrealized_intraday_pl"]),
+        parse(Float64, d["unrealized_intraday_plpc"]),
+        parse(Float64, d["current_price"]),
+        parse(Float64, d["lastday_price"]),
+        parse(Float64, d["change_today"])
     )
 end
 

@@ -1,7 +1,7 @@
 module Alpaca
 
 using UUIDs: UUID
-using Dates: DateTime, unix2datetime
+using Dates: DateTime, Date, Time, unix2datetime
 using TradingBase:
     AbstractAccount,
     AbstractBrokerage,
