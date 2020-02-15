@@ -11,6 +11,7 @@ using TradingBase:
     OrderIntent,
     MarketOrder,
     LimitOrder,
+    StopLimitOrder,
     StopOrder,
     DAY,
     GTC,

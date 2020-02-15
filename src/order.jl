@@ -15,8 +15,8 @@ struct AlpacaOrder <: AbstractOrder
     asset_id
     symbol
     asset_class
-    qty
-    filled_qty
+    quantity
+    filled_quantity
     type
     side
     duration
@@ -117,6 +117,9 @@ JSON.lower(::CLS) = "cls"
 JSON.lower(::IOC) = "ioc"
 JSON.lower(::FOK) = "fok"
 JSON.lower(::MarketOrder) = "market"
+JSON.lower(::LimitOrder) = "limit"
+JSON.lower(::StopOrder) = "stop"
+JSON.lower(::StopLimitOrder) = "stop_limit"
 
 function submit_order(api::AlpacaBrokerage, ticker, quantity::Integer, type; duration::AbstractOrderDuration = DAY(), extended_hours = false, client_order_id = nothing)
     side = quantity >= 0 ? "buy" : "sell"
@@ -128,7 +131,8 @@ function submit_order(api::AlpacaBrokerage, ticker, quantity::Integer, type; dur
                 :limit_price => limit_price(type),
                 :stop_price => stop_price(type),
                 :extended_hours => extended_hours,
-                :client_order_id => client_order_id)
+                :client_order_id => client_order_id,
+                :order_class => "simple")
     alpaca_post(api, "/orders", body) |> AlpacaOrder
 end
 

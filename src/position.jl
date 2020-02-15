@@ -6,7 +6,7 @@ struct AlpacaPosition <: AbstractPosition
     exchange
     asset_class
     avg_entry_price
-    qty
+    quantity
     side
     market_value
     cost_basis

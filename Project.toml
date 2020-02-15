@@ -1,7 +1,7 @@
 name = "Alpaca"
 uuid = "08730436-0a26-4829-8498-830316431e90"
 authors = ["Sebastian Rollen <sebastian.rollen@betterment.com>"]
-version = "3.0.2"
+version = "3.0.3"
 
 [deps]
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
