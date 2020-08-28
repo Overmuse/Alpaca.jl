@@ -73,7 +73,8 @@ end
 function alpaca_headers(x::AlpacaBrokerage)
     Dict(
         "APCA-API-KEY-ID" => x.id,
-        "APCA-API-SECRET-KEY" => x.key
+        "APCA-API-SECRET-KEY" => x.key,
+        "Content-Type" => "application/json",
     )
 end
 
