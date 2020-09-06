@@ -25,10 +25,10 @@ struct AlpacaOrder <: AbstractOrder
     filled_avg_price::Union{Float64, Nothing}
     status::String
     extended_hours::Bool
-    legs::Union{AlpacaOrder, Nothing}
+    legs::Union{Vector{AlpacaOrder}, Nothing}
 end
 
-function AlpacaOrder(d::Dict)
+function AlpacaOrder(d::Dict{String, Any})
     AlpacaOrder(
         UUID(d["id"]),
         d["client_order_id"],
@@ -83,14 +83,14 @@ function Base.show(io::IO, o::AlpacaOrder)
 end
 
 function Base.show(io::IO, ::MIME"text/plain", o::AlpacaOrder)
-    println(io, rpad(lpad("Order", 29), 53))
-    println(io, "-"^53)
+    println(io, rpad(lpad("Order", 34), 62))
+    println(io, "-"^62)
     for property in propertynames(o)[1:end-1]
         print(io, string(property) * ":")
-        println(io, lpad(something(getproperty(o, property), "null"), 52 - length(string(property))))
+        println(io, lpad(something(getproperty(o, property), "null"), 61 - length(string(property))))
     end
     print(io, string(propertynames(o)[end]) * ":")
-    print(io, lpad(something(getproperty(o, propertynames(o)[end]), "null"), 52 - length(string(propertynames(o)[end]))))
+    print(io, lpad(something(getproperty(o, propertynames(o)[end]), "null"), 61 - length(string(propertynames(o)[end]))))
 end
 
 # Functions --------------------------------------------------------------------------------
@@ -123,21 +123,38 @@ JSON.lower(::LimitOrder) = "limit"
 JSON.lower(::StopOrder) = "stop"
 JSON.lower(::StopLimitOrder) = "stop_limit"
 
-function submit_order(api::AlpacaBrokerage, ticker, quantity::Integer, type; duration::AbstractOrderDuration = DAY(), extended_hours = false, client_order_id = nothing)
+function submit_order(
+    api::AlpacaBrokerage,
+    ticker,
+    quantity::Integer,
+    type;
+    duration::AbstractOrderDuration = DAY(),
+    extended_hours = false,
+    client_order_id = nothing,
+    order_class = "simple",
+    take_profit = nothing,
+    stop_loss = nothing
+)
     side = quantity >= 0 ? "buy" : "sell"
     lp = limit_price(type)
     sp = stop_price(type)
-    body = Dict(:symbol => ticker,
-                :qty => string(abs(quantity)),
-                :side => side,
-                :type => type,
-                :time_in_force => duration,
-                :limit_price => isnothing(lp) ? nothing : string(lp),
-                :stop_price => isnothing(sp) ? nothing : string(sp),
-                :extended_hours => extended_hours,
-                :client_order_id => client_order_id,
-                :order_class => "simple")
-    alpaca_post(api, "/orders", body) |> AlpacaOrder
+    body = Dict(
+        :symbol => ticker,
+        :qty => string(abs(quantity)),
+        :side => side,
+        :type => type,
+        :time_in_force => duration,
+        :limit_price => isnothing(lp) ? nothing : string(lp),
+        :stop_price => isnothing(sp) ? nothing : string(sp),
+        :extended_hours => extended_hours,
+        :client_order_id => client_order_id,
+        :order_class => order_class,
+        :take_profit => take_profit,
+        :stop_loss => stop_loss,
+    )
+    res = alpaca_post(api, "/orders", body)
+    res["legs"] = AlpacaOrder.(res["legs"])
+    AlpacaOrder(res)
 end
 
 function cancel_order(api::AlpacaBrokerage, id::UUID)
