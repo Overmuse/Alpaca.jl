@@ -85,7 +85,7 @@ end
 function Base.show(io::IO, ::MIME"text/plain", o::AlpacaOrder)
     println(io, rpad(lpad("Order", 29), 53))
     println(io, "-"^53)
-    for property in propertynames(o)
+    for property in propertynames(o)[1:end-1]
         print(io, string(property) * ":")
         println(io, lpad(something(getproperty(o, property), "null"), 52 - length(string(property))))
     end
