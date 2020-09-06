@@ -57,14 +57,14 @@ alpaca_url(api) = api.url
 function get_credentials(;live = false)
     if live
         return AlpacaBrokerage(
-            ENV["APCA-LIVE-KEY-ID"],
-            ENV["APCA-LIVE-SECRET-KEY"],
+            ENV["APCA_LIVE_KEY_ID"],
+            ENV["APCA_LIVE_SECRET_KEY"],
             LIVE_URL
         )
     else
         return AlpacaBrokerage(
-            ENV["APCA-PAPER-KEY-ID"],
-            ENV["APCA-PAPER-SECRET-KEY"],
+            ENV["APCA_PAPER_KEY_ID"],
+            ENV["APCA_PAPER_SECRET_KEY"],
             PAPER_URL
             )
     end
