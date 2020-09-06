@@ -25,6 +25,7 @@ struct AlpacaOrder <: AbstractOrder
     filled_avg_price::Union{Float64, Nothing}
     status::String
     extended_hours::Bool
+    legs::Union{AlpacaOrder, Nothing}
 end
 
 function AlpacaOrder(d::Dict)
@@ -50,7 +51,8 @@ function AlpacaOrder(d::Dict)
         isnothing(get(d, "stop_price", nothing)) ? nothing : parse(Float64, d["stop_price"]),
         isnothing(get(d, "filled_avg_price", nothing)) ? nothing : parse(Float64, d["filled_avg_price"]),
         d["status"],
-        d["extended_hours"]
+        d["extended_hours"],
+        d["legs"]
     )
 end
 
@@ -83,7 +85,7 @@ end
 function Base.show(io::IO, ::MIME"text/plain", o::AlpacaOrder)
     println(io, rpad(lpad("Order", 29), 53))
     println(io, "-"^53)
-    for property in propertynames(o)[1:end-1]
+    for property in propertynames(o)
         print(io, string(property) * ":")
         println(io, lpad(something(getproperty(o, property), "null"), 52 - length(string(property))))
     end
