@@ -29,6 +29,9 @@ struct AlpacaOrder <: AbstractOrder
 end
 
 function AlpacaOrder(d::Dict{String, Any})
+    if !isnothing(d["legs"])
+        d["legs"] = AlpacaOrder.(d["legs"])
+    end
     AlpacaOrder(
         UUID(d["id"]),
         d["client_order_id"],
@@ -95,20 +98,21 @@ end
 
 # Functions --------------------------------------------------------------------------------
 
-function get_order(api::AlpacaBrokerage, id::UUID)
-    AlpacaOrder(alpaca_get(api, "/orders/" * string(id), Dict()))
+function get_order(api::AlpacaBrokerage, id::UUID; nested = false)
+    AlpacaOrder(alpaca_get(api, "/orders/" * string(id), Dict(:nested => nested)))
 end
 
-function get_order(api::AlpacaBrokerage, client_order_id::String)
-    AlpacaOrder(alpaca_get(api, "/orders:by_client_order_id", Dict(:client_order_id => client_order_id)))
+function get_order(api::AlpacaBrokerage, client_order_id::String; nested = false)
+    AlpacaOrder(alpaca_get(api, "/orders:by_client_order_id", Dict(:client_order_id => client_order_id, :nested => nested)))
 end
 
-function get_orders(api::AlpacaBrokerage; status = "open", limit = 50, after = "", until = "", direction = "desc")
+function get_orders(api::AlpacaBrokerage; status = "open", limit = 50, after = "", until = "", direction = "desc", nested = false)
     params = Dict(:status => status,
                   :limit => limit,
                   :after => after,
                   :until => until,
-                  :direction => direction)
+                  :direction => direction,
+                  :nested => nested)
     AlpacaOrder.(alpaca_get(api, "/orders", params))
 end
 
@@ -152,9 +156,7 @@ function submit_order(
         :take_profit => take_profit,
         :stop_loss => stop_loss,
     )
-    res = alpaca_post(api, "/orders", body)
-    res["legs"] = AlpacaOrder.(res["legs"])
-    AlpacaOrder(res)
+    alpaca_post(api, "/orders", body) |> AlpacaOrder
 end
 
 function cancel_order(api::AlpacaBrokerage, id::UUID)
