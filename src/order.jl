@@ -46,9 +46,9 @@ function AlpacaOrder(d::Dict)
         d["type"],
         d["side"],
         d["time_in_force"],
-        isnothing(d["limit_price"]) ? nothing : parse(Float64, d["limit_price"]),
-        isnothing(d["stop_price"]) ? nothing : parse(Float64, d["stop_price"]),
-        isnothing(d["filled_avg_price"]) ? nothing : parse(Float64, d["filled_avg_price"]),
+        isnothing(get(d, "limit_price", nothing)) ? nothing : parse(Float64, d["limit_price"]),
+        isnothing(get(d, "stop_price", nothing)) ? nothing : parse(Float64, d["stop_price"]),
+        isnothing(get(d, "filled_avg_price", nothing)) ? nothing : parse(Float64, d["filled_avg_price"]),
         d["status"],
         d["extended_hours"]
     )
@@ -123,13 +123,15 @@ JSON.lower(::StopLimitOrder) = "stop_limit"
 
 function submit_order(api::AlpacaBrokerage, ticker, quantity::Integer, type; duration::AbstractOrderDuration = DAY(), extended_hours = false, client_order_id = nothing)
     side = quantity >= 0 ? "buy" : "sell"
+    lp = limit_price(type)
+    sp = stop_price(type)
     body = Dict(:symbol => ticker,
-                :qty => abs(quantity),
+                :qty => string(abs(quantity)),
                 :side => side,
                 :type => type,
                 :time_in_force => duration,
-                :limit_price => limit_price(type),
-                :stop_price => stop_price(type),
+                :limit_price => isnothing(lp) ? nothing : string(lp),
+                :stop_price => isnothing(sp) ? nothing : string(sp),
                 :extended_hours => extended_hours,
                 :client_order_id => client_order_id,
                 :order_class => "simple")

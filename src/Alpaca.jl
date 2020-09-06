@@ -80,28 +80,28 @@ end
 
 function alpaca_get(api::AlpacaBrokerage, endpoint::String, params = Dict(), body = "")
     headers = alpaca_headers(api)
-    sleep(0.3) # 200 requests / minute limit
+    #sleep(0.3) # 200 requests / minute limit
     result = HTTP.get(alpaca_url(api) * endpoint, headers, JSON.json(body), query = params)
     !HTTP.iserror(result) && JSON.parse(String(result.body))
 end
 
 function alpaca_post(api::AlpacaBrokerage, endpoint::String, body)
     headers = alpaca_headers(api)
-    sleep(0.3) # 200 requests / minute limit
+    #sleep(0.3) # 200 requests / minute limit
     result = HTTP.post(alpaca_url(api) * endpoint, headers, JSON.json(body))
     !HTTP.iserror(result) && JSON.parse(String(result.body))
 end
 
 function alpaca_delete(api::AlpacaBrokerage, endpoint::String)
     headers = alpaca_headers(api)
-    sleep(0.3) # 200 requests / minute limit
+    #sleep(0.3) # 200 requests / minute limit
     result = HTTP.delete(alpaca_url(api) * endpoint, headers)
     !HTTP.iserror(result) && return
 end
 
 function alpaca_market_get(api::AlpacaBrokerage, endpoint::String, params = Dict(), body = "")
     headers = alpaca_headers(api)
-    sleep(0.3) # 200 requests / minute limit
+    #sleep(0.3) # 200 requests / minute limit
     result = HTTP.get(DATA_URL * endpoint, headers, JSON.json(body), query = params)
     !HTTP.iserror(result) && JSON.parse(String(result.body))
 end
