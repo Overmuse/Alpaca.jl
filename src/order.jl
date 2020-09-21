@@ -26,6 +26,9 @@ struct AlpacaOrder <: AbstractOrder
     status::String
     extended_hours::Bool
     legs::Union{Vector{AlpacaOrder}, Nothing}
+    trail_price::Union{Float64, Nothing}
+    trail_percent::Union{Float64, Nothing}
+    hwm::Union{Float64, Nothing}
 end
 
 function AlpacaOrder(d::Dict{String, Any})
@@ -55,7 +58,10 @@ function AlpacaOrder(d::Dict{String, Any})
         isnothing(get(d, "filled_avg_price", nothing)) ? nothing : parse(Float64, d["filled_avg_price"]),
         d["status"],
         d["extended_hours"],
-        d["legs"]
+        d["legs"],
+        isnothing(get(d, "trail_price", nothing)) ? nothing : parse(Float64, d["trail_price"]),
+        isnothing(get(d, "trail_percent", nothing)) ? nothing : parse(Float64, d["trail_percent"]),
+        isnothing(get(d, "hwm", nothing)) ? nothing : parse(Float64, d["hwm"]),
     )
 end
 
@@ -126,6 +132,8 @@ JSON.lower(::MarketOrder) = "market"
 JSON.lower(::LimitOrder) = "limit"
 JSON.lower(::StopOrder) = "stop"
 JSON.lower(::StopLimitOrder) = "stop_limit"
+JSON.lower(::TrailingStopPriceOrder) = "trailing_stop"
+JSON.lower(::TrailingStopPercentOrder) = "trailing_stop"
 
 function submit_order(
     api::AlpacaBrokerage,
@@ -137,11 +145,13 @@ function submit_order(
     client_order_id = nothing,
     order_class = "simple",
     take_profit = nothing,
-    stop_loss = nothing
+    stop_loss = nothing,
 )
     side = quantity >= 0 ? "buy" : "sell"
     lp = limit_price(type)
     sp = stop_price(type)
+    tpr = trail_price(type)
+    tpe = trail_percent(type)
     body = Dict(
         :symbol => ticker,
         :qty => string(abs(quantity)),
@@ -155,6 +165,8 @@ function submit_order(
         :order_class => order_class,
         :take_profit => take_profit,
         :stop_loss => stop_loss,
+        :trail_price => isnothing(tpr) ? nothing : string(tpr),
+        :trail_percent => isnothing(tpe) ? nothing : string(tpe),
     )
     alpaca_post(api, "/orders", body) |> AlpacaOrder
 end

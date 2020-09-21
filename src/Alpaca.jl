@@ -13,6 +13,8 @@ using TradingBase:
     LimitOrder,
     StopLimitOrder,
     StopOrder,
+    TrailingStopPriceOrder,
+    TrailingStopPercentOrder,
     DAY,
     GTC,
     OPG,
@@ -20,7 +22,9 @@ using TradingBase:
     IOC,
     FOK,
     limit_price,
-    stop_price
+    stop_price,
+    trail_price,
+    trail_percent
 
 import TradingBase:
     get_account,
